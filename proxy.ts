@@ -51,13 +51,6 @@ export async function proxy(request: NextRequest) {
         console.log('Setting headers for User:', session.user.id);
         requestHeaders.set("x-user-id", session.user.id);
         requestHeaders.set("x-user-email", session.user.email);
-        
-        // Also try setting it on the original request object if possible
-        try {
-            (request.headers as any).set("x-user-id", session.user.id);
-        } catch (e) {
-            // Might be read-only
-        }
     }
 
     const response = NextResponse.next({
