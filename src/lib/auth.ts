@@ -22,6 +22,16 @@ export const auth = betterAuth({
     emailAndPassword: {
         enabled: true,
     },
+    socialProviders: {
+        google: {
+            clientId: process.env.GOOGLE_CLIENT_ID || "placeholder_google_id",
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET || "placeholder_google_secret",
+        },
+        github: {
+            clientId: process.env.GITHUB_CLIENT_ID || "placeholder_github_id",
+            clientSecret: process.env.GITHUB_CLIENT_SECRET || "placeholder_github_secret",
+        },
+    },
     trustedProxyHeaders: true,
     trustedOrigins: [
         process.env.BETTER_AUTH_URL?.replace(/\/$/, "") as string,
