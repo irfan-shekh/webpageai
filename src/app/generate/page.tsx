@@ -82,6 +82,7 @@ export function GenerateWorkspaceContent() {
   // Responsive device preview toggles
   const [viewMode, setViewMode] = useState<"preview" | "code">("preview");
   const [responsiveMode, setResponsiveMode] = useState<"desktop" | "mobile">("desktop");
+  const [mobileTab, setMobileTab] = useState<"console" | "preview">("console");
 
   // Auto-scroll chat window
   useEffect(() => {
@@ -141,6 +142,9 @@ export function GenerateWorkspaceContent() {
         accumulatedHtml += chunk;
         setData(accumulatedHtml);
       }
+      
+      // Swing mobile view over to preview
+      setMobileTab("preview");
       
       // Add AI confirmation message
       setChatHistory(prev => [...prev, {
@@ -219,7 +223,7 @@ Browse your site in the preview canvas on the right, or export/download it direc
   };
 
   return (
-    <div className="bg-[#02040a] text-slate-200 min-h-screen font-sans flex relative overflow-hidden h-screen">
+    <div className="bg-[#02040a] text-slate-200 min-h-screen font-sans flex flex-col md:flex-row relative overflow-hidden h-screen">
       
       {/* 🌌 AMBIENT BACKGROUND SYSTEM */}
       <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
@@ -227,8 +231,39 @@ Browse your site in the preview canvas on the right, or export/download it direc
         <div className="absolute bottom-[-50px] right-[20%] w-[300px] h-[300px] bg-teal-600/5 rounded-full blur-[80px] animate-pulse [animation-delay:1.5s]" />
       </div>
 
+      {/* ── MOBILE BAR SWITCHER ── */}
+      <div className="flex md:hidden bg-black/40 border-b border-white/5 p-3.5 justify-between items-center z-30 shrink-0 backdrop-blur-xl">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => router.push("/dashboard")}
+            className="p-2 rounded-lg bg-white/5 border border-white/5 text-slate-400 hover:text-white"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <span className="text-xs font-bold text-white truncate max-w-[130px]">{projectName}</span>
+        </div>
+        <div className="flex bg-white/5 rounded-xl p-0.5 border border-white/5">
+          <button
+            onClick={() => setMobileTab("console")}
+            className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all ${
+              mobileTab === "console" ? "bg-emerald-500/10 text-emerald-300 border border-emerald-500/20" : "text-slate-400 border border-transparent"
+            }`}
+          >
+            Console
+          </button>
+          <button
+            onClick={() => setMobileTab("preview")}
+            className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all ${
+              mobileTab === "preview" ? "bg-emerald-500/10 text-emerald-300 border border-emerald-500/20" : "text-slate-400 border border-transparent"
+            }`}
+          >
+            Preview {data ? "⚡" : ""}
+          </button>
+        </div>
+      </div>
+
       {/* ── 1. LEFT COLUMN: CHAT & STYLING PANEL ── */}
-      <aside className="w-100 xl:w-112 border-r border-white/5 bg-[#06080d]/30 backdrop-blur-2xl flex flex-col justify-between shrink-0 h-full relative z-20">
+      <aside className={`w-full md:w-100 xl:w-112 border-r border-white/5 bg-[#06080d]/30 backdrop-blur-2xl flex flex-col justify-between shrink-0 h-full relative z-20 ${mobileTab === 'console' ? 'flex' : 'hidden md:flex'}`}>
         
         {/* Workspace Brand Header */}
         <div className="p-5 border-b border-white/5 flex items-center justify-between">
@@ -412,7 +447,7 @@ Browse your site in the preview canvas on the right, or export/download it direc
       </aside>
 
       {/* ── 2. RIGHT COLUMN: PREVIEW CANVAS & ACTIONS ── */}
-      <main className="flex-1 flex flex-col min-w-0 h-full relative z-10 bg-black/30">
+      <main className={`flex-1 flex flex-col min-w-0 h-full relative z-10 bg-black/30 ${mobileTab === 'preview' ? 'flex' : 'hidden md:flex'}`}>
         
         {/* Canvas Toolbar Header */}
         <header className="h-16 border-b border-white/5 px-6 flex items-center justify-between bg-black/20 z-30">
@@ -486,7 +521,7 @@ Browse your site in the preview canvas on the right, or export/download it direc
         </header>
 
         {/* Live Canvas workspace frame wrapper */}
-        <div className="flex-1 p-6 flex items-center justify-center overflow-hidden relative">
+        <div className="flex-1 p-2 sm:p-6 flex items-center justify-center overflow-hidden relative">
           
           {/* SKELETON PLACEHOLDER OR EMPTY STATE */}
           {!data && !loading && (
@@ -524,7 +559,7 @@ Browse your site in the preview canvas on the right, or export/download it direc
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.4 }}
               className={`rounded-2xl border border-white/5 bg-black/60 shadow-2xl overflow-hidden relative transition-all duration-500 ${
-                responsiveMode === "mobile" ? "w-[360px] h-[640px]" : "w-full h-full"
+                responsiveMode === "mobile" ? "w-full max-w-[360px] h-[580px] max-h-full" : "w-full h-full"
               }`}
             >
               {/* Responsive mock indicator bar */}

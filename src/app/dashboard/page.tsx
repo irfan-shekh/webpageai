@@ -61,6 +61,7 @@ export default function Dashboard() {
 
   // Sidebar navigation state
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [theme, setTheme] = useState<"dark" | "light">(() => {
     if (typeof window !== "undefined") {
@@ -327,6 +328,124 @@ export default function Dashboard() {
         )}
       </AnimatePresence>
 
+      {/* Mobile Drawer Navigation Menu */}
+      <AnimatePresence>
+        {showMobileMenu && (
+          <>
+            {/* Dark blurred overlay backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowMobileMenu(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[999] lg:hidden"
+            />
+            {/* Sliding Sidebar Drawer */}
+            <motion.aside
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 180 }}
+              className="fixed inset-y-0 left-0 w-72 bg-[#06080d] border-r border-white/5 z-[1000] flex flex-col justify-between p-6 lg:hidden"
+            >
+              <div>
+                {/* Header / Brand logo */}
+                <div className="flex items-center justify-between mb-10">
+                  <div className="flex items-center gap-3 cursor-pointer" onClick={() => { setShowMobileMenu(false); router.push("/"); }}>
+                    <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center">
+                      <Sparkles className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-sm font-black tracking-widest text-white font-mono uppercase">
+                      Webpage<span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">AI</span>
+                    </span>
+                  </div>
+                  <button 
+                    onClick={() => setShowMobileMenu(false)}
+                    className="p-2 rounded-lg bg-white/5 border border-white/5 text-slate-400 hover:text-white"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Navigation links */}
+                <nav className="space-y-1.5">
+                  {[
+                    { id: "dashboard", label: "Overview", icon: Layout },
+                    { id: "projects", label: "My Projects", icon: Folder, badge: pages.length },
+                    { id: "templates", label: "Templates", icon: LayoutTemplate },
+                    { id: "analytics", label: "Analytics", icon: BarChart3 },
+                    { id: "settings", label: "Settings", icon: Settings },
+                    { id: "billing", label: "Billing", icon: CreditCard }
+                  ].map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => {
+                        setActiveTab(item.id);
+                        setShowMobileMenu(false);
+                      }}
+                      className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
+                        activeTab === item.id
+                          ? "bg-emerald-500/10 text-emerald-300 border border-emerald-500/20"
+                          : "text-slate-400 hover:text-white hover:bg-white/5 border border-transparent"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <item.icon className={`w-4 h-4 ${activeTab === item.id ? "text-emerald-400" : ""}`} />
+                        <span>{item.label}</span>
+                      </div>
+                      {item.badge !== undefined && (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-slate-400 border border-white/5">
+                          {item.badge}
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </nav>
+              </div>
+
+              {/* User Workspace Profile Footer */}
+              <div className="border-t border-white/5 pt-6 bg-black/10 -mx-6 px-6 -mb-6 pb-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-emerald-500/20 border border-white/10 flex items-center justify-center text-xs text-emerald-300 font-bold uppercase">
+                      {session?.user?.name ? session.user.name[0] : <User className="w-4 h-4" />}
+                    </div>
+                    <div className="truncate max-w-[140px]">
+                      <p className="text-xs font-bold text-white leading-none truncate">{session?.user?.name || "AI Architect"}</p>
+                      <p className="text-[10px] text-slate-500 mt-1 truncate">{session?.user?.email || "architect@webpageai.com"}</p>
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowMobileMenu(false);
+                    handleLogout();
+                  }}
+                  disabled={loggingOut}
+                  className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-lg border border-white/5 text-xs font-bold transition-all ${
+                    loggingOut
+                      ? "bg-white/5 border-white/10 text-slate-500 cursor-not-allowed"
+                      : "hover:border-red-500/20 hover:bg-red-500/10 text-slate-400 hover:text-red-400"
+                  }`}
+                >
+                  {loggingOut ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-400" />
+                      Signing Out...
+                    </>
+                  ) : (
+                    <>
+                      <LogOut className="w-3.5 h-3.5" />
+                      Sign Out
+                    </>
+                  )}
+                </button>
+              </div>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
+
       <div className="bg-[#02040a] text-slate-200 min-h-screen font-sans flex relative overflow-hidden">
       {/* 🌌 AMBIENT BACKGROUND GLOWS */}
       <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
@@ -431,8 +550,17 @@ export default function Dashboard() {
       <div className="flex-1 flex flex-col min-w-0 overflow-y-auto relative z-10">
         
         {/* TOPBAR (Search, Assist, Notifications) */}
-        <header className="h-20 border-b border-white/5 px-8 flex items-center justify-between backdrop-blur-md sticky top-0 bg-[#02040a]/80 z-30">
-          <div className="flex items-center gap-4 w-96">
+        <header className="h-20 border-b border-white/5 px-4 sm:px-8 flex items-center justify-between backdrop-blur-md sticky top-0 bg-[#02040a]/80 z-30">
+          <div className="flex items-center gap-2 sm:gap-4 w-full max-w-[200px] sm:max-w-xs md:w-96">
+            {/* Mobile Hamburger menu toggle */}
+            <div className="flex items-center gap-3 lg:hidden">
+              <button 
+                onClick={() => setShowMobileMenu(true)} 
+                className="p-2 rounded-lg bg-white/5 border border-white/5 text-slate-400 hover:text-white"
+              >
+                <Sliders className="w-4 h-4 text-emerald-400" />
+              </button>
+            </div>
             <div className="relative w-full">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
               <input
