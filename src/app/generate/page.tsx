@@ -24,7 +24,6 @@ import {
   Trash2,
   Sliders,
   Laptop,
-  CheckCircle2,
   Database
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";

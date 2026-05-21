@@ -61,6 +61,7 @@ export default function Dashboard() {
 
   // Sidebar navigation state
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [mounted, setMounted] = useState(false);
   const [theme, setTheme] = useState<"dark" | "light">(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("theme") as "dark" | "light";
@@ -68,6 +69,11 @@ export default function Dashboard() {
     }
     return "dark";
   });
+
+  useEffect(() => {
+    const handle = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(handle);
+  }, []);
 
   useEffect(() => {
     if (theme === "light") {
@@ -452,9 +458,11 @@ export default function Dashboard() {
             <button
               onClick={toggleTheme}
               className="p-2.5 rounded-xl bg-white/5 border border-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
-              title={theme === "dark" ? "Switch to Light Theme" : "Switch to Dark Theme"}
+              title={!mounted ? "Loading Theme" : theme === "dark" ? "Switch to Light Theme" : "Switch to Dark Theme"}
             >
-              {theme === "dark" ? (
+              {!mounted ? (
+                <div className="w-4 h-4 rounded-full bg-white/10" />
+              ) : theme === "dark" ? (
                 <Sun className="w-4 h-4 text-amber-400 animate-[spin_30s_linear_infinite]" />
               ) : (
                 <Moon className="w-4 h-4 text-indigo-400" />
@@ -529,7 +537,33 @@ export default function Dashboard() {
                 </div>
 
                 {/* EMPTY PROJECTS VIEW */}
-                {pages.length === 0 ? (
+                {loading ? (
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 animate-pulse">
+                    {[1, 2, 3].map((idx) => (
+                      <div
+                        key={idx}
+                        className="relative rounded-2xl border border-white/5 bg-[#06080d]/45 p-6 backdrop-blur-xl shadow-2xl overflow-hidden"
+                      >
+                        <div className="flex items-center justify-between mb-6">
+                          <div className="w-10 h-10 rounded-xl bg-white/5" />
+                          <div className="w-16 h-4 rounded-full bg-white/5" />
+                        </div>
+                        <div className="h-5 w-2/3 bg-white/5 rounded-lg mb-3" />
+                        <div className="h-3 w-1/3 bg-white/5 rounded-lg" />
+                        <div className="mt-8 flex items-center justify-between border-t border-white/5 pt-4">
+                          <div className="flex gap-2">
+                            <div className="h-4 w-12 bg-white/5 rounded" />
+                            <div className="h-4 w-12 bg-white/5 rounded" />
+                          </div>
+                          <div className="flex gap-1">
+                            <div className="h-8 w-8 bg-white/5 rounded-lg" />
+                            <div className="h-8 w-8 bg-white/5 rounded-lg" />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : pages.length === 0 ? (
                   <div className="text-center rounded-3xl border border-white/5 bg-[#06080d]/20 p-16 backdrop-blur-md">
                     <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/10 mb-6">
                       <LayoutTemplate className="h-8 w-8 text-emerald-400" />
@@ -660,7 +694,33 @@ export default function Dashboard() {
               </div>
 
               {/* EMPTY PROJECTS VIEW */}
-              {pages.length === 0 ? (
+              {loading ? (
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 animate-pulse">
+                  {[1, 2, 3].map((idx) => (
+                    <div
+                      key={idx}
+                      className="relative rounded-2xl border border-white/5 bg-[#06080d]/45 p-6 backdrop-blur-xl shadow-2xl overflow-hidden"
+                    >
+                      <div className="flex items-center justify-between mb-6">
+                        <div className="w-10 h-10 rounded-xl bg-white/5" />
+                        <div className="w-16 h-4 rounded-full bg-white/5" />
+                      </div>
+                      <div className="h-5 w-2/3 bg-white/5 rounded-lg mb-3" />
+                      <div className="h-3 w-1/3 bg-white/5 rounded-lg" />
+                      <div className="mt-8 flex items-center justify-between border-t border-white/5 pt-4">
+                        <div className="flex gap-2">
+                          <div className="h-4 w-12 bg-white/5 rounded" />
+                          <div className="h-4 w-12 bg-white/5 rounded" />
+                        </div>
+                        <div className="flex gap-1">
+                          <div className="h-8 w-8 bg-white/5 rounded-lg" />
+                          <div className="h-8 w-8 bg-white/5 rounded-lg" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : pages.length === 0 ? (
                 <div className="text-center rounded-3xl border border-white/5 bg-[#06080d]/20 p-16 backdrop-blur-md">
                   <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/10 mb-6">
                     <LayoutTemplate className="h-8 w-8 text-emerald-400" />

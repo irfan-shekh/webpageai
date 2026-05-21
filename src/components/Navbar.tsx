@@ -123,9 +123,11 @@ export default function Navbar() {
                 <button
                   onClick={toggleTheme}
                   className="p-2 rounded-xl bg-white/5 border border-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-all cursor-pointer mr-1"
-                  title={theme === "dark" ? "Switch to Light Theme" : "Switch to Dark Theme"}
+                  title={!mounted ? "Loading Theme" : theme === "dark" ? "Switch to Light Theme" : "Switch to Dark Theme"}
                 >
-                  {theme === "dark" ? (
+                  {!mounted ? (
+                    <div className="w-4 h-4 rounded-full bg-white/10" />
+                  ) : theme === "dark" ? (
                     <Sun className="w-4 h-4 text-amber-400 animate-[spin_30s_linear_infinite]" />
                   ) : (
                     <Moon className="w-4 h-4 text-indigo-400" />
