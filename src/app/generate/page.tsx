@@ -59,11 +59,11 @@ export function GenerateWorkspaceContent() {
   // Style Presets State
   const [activeStyle, setActiveStyle] = useState(() => {
     const styleFromQuery = searchParams.get("style");
-    return styleFromQuery || "dark";
+    return styleFromQuery || "auto";
   });
   const [activeColor, setActiveColor] = useState(() => {
     const colorFromQuery = searchParams.get("color");
-    return colorFromQuery || "emerald";
+    return colorFromQuery || "auto";
   });
 
   // Left panel view mode / Chat history list
@@ -147,12 +147,22 @@ export function GenerateWorkspaceContent() {
       setMobileTab("preview");
       
       // Add AI confirmation message
+      const styleDescriptions: Record<string, string> = {
+        auto: "optimized styles and components tailored perfectly to your brand and niche",
+        dark: "futuristic dark visual aesthetics with gorgeous neon glow overlays",
+        light: "sleek minimalist light aesthetics featuring clean typography and high contrast layout structure",
+        glassmorphism: "premium glassmorphic frosted cards with heavy backdrop blur filters and beautiful colorful ambient gradients",
+        brutalism: "brutalist neon layouts featuring high-contrast layout blocks and bold retro elements"
+      };
+
+      const styleDesc = styleDescriptions[activeStyle] || styleDescriptions.auto;
+
       setChatHistory(prev => [...prev, {
         role: "ai",
         content: `✨ Perfect! I've successfully compiled your multi-page website project in real-time. Under the hood, I've constructed:
 *   **Fully responsive pages** mapped to clean sections.
 *   **Embedded client-side router** to support seamless transitions without reloads.
-*   **Futuristic dark visual aesthetics** with beautiful gradients.
+*   **${styleDesc}** tailored beautifully for your brand.
 
 Browse your site in the preview canvas on the right, or export/download it directly to host it anywhere!`
       }]);
@@ -370,6 +380,18 @@ Browse your site in the preview canvas on the right, or export/download it direc
             <div className="space-y-2">
               <label className="text-[10px] text-slate-500 font-semibold uppercase">Style Framework</label>
               <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setActiveStyle("auto")}
+                  className={`col-span-2 py-2 rounded-lg text-[10px] font-bold border transition-all flex items-center justify-center gap-1.5 ${
+                    activeStyle === "auto"
+                      ? "bg-emerald-500/10 text-emerald-300 border-emerald-500/30"
+                      : "bg-white/[0.01] text-slate-500 border-white/5 hover:text-white"
+                  }`}
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                  ✨ Auto Select (AI&apos;s Choice)
+                </button>
                 {[
                   { id: "dark", label: "Futuristic Dark" },
                   { id: "light", label: "Sleek Minimalist" },
@@ -394,26 +416,40 @@ Browse your site in the preview canvas on the right, or export/download it direc
             {/* Colors Preset Selector */}
             <div className="space-y-2">
               <label className="text-[10px] text-slate-500 font-semibold uppercase">Primary Accent Glow</label>
-              <div className="grid grid-cols-4 gap-2">
-                {[
-                  { id: "emerald", label: "Emerald", color: "bg-emerald-500" },
-                  { id: "teal", label: "Mint Teal", color: "bg-teal-500" },
-                  { id: "cyan", label: "Ice Cyan", color: "bg-cyan-500" },
-                  { id: "amber", label: "Warm Gold", color: "bg-amber-500" }
-                ].map(col => (
-                  <button
-                    key={col.id}
-                    onClick={() => setActiveColor(col.id)}
-                    className={`p-1 rounded-lg border transition-all flex flex-col items-center gap-1 ${
-                      activeColor === col.id
-                        ? "bg-white/5 border-emerald-500/40 text-emerald-300"
-                        : "bg-white/[0.01] border-white/5 text-slate-600 hover:text-white"
-                    }`}
-                  >
-                    <span className={`w-3 h-3 rounded-full ${col.color}`} />
-                    <span className="text-[9px] uppercase font-bold tracking-tighter">{col.label}</span>
-                  </button>
-                ))}
+              <div className="flex flex-col gap-2">
+                <button
+                  type="button"
+                  onClick={() => setActiveColor("auto")}
+                  className={`w-full py-2 rounded-lg text-[10px] font-bold border transition-all flex items-center justify-center gap-1.5 ${
+                    activeColor === "auto"
+                      ? "bg-white/5 border-emerald-500/40 text-emerald-300"
+                      : "bg-white/[0.01] border-white/5 text-slate-500 hover:text-white"
+                  }`}
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                  ✨ Auto Select (Smart Match)
+                </button>
+                <div className="grid grid-cols-4 gap-2">
+                  {[
+                    { id: "emerald", label: "Emerald", color: "bg-emerald-500" },
+                    { id: "teal", label: "Mint Teal", color: "bg-teal-500" },
+                    { id: "cyan", label: "Ice Cyan", color: "bg-cyan-500" },
+                    { id: "amber", label: "Warm Gold", color: "bg-amber-500" }
+                  ].map(col => (
+                    <button
+                      key={col.id}
+                      onClick={() => setActiveColor(col.id)}
+                      className={`p-1 rounded-lg border transition-all flex flex-col items-center gap-1 ${
+                        activeColor === col.id
+                          ? "bg-white/5 border-emerald-500/40 text-emerald-300"
+                          : "bg-white/[0.01] border-white/5 text-slate-600 hover:text-white"
+                      }`}
+                    >
+                      <span className={`w-3 h-3 rounded-full ${col.color}`} />
+                      <span className="text-[9px] uppercase font-bold tracking-tighter">{col.label}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

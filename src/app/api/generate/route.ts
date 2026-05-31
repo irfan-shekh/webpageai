@@ -68,7 +68,7 @@ CRITICAL CONSTRAINTS:
 
 export async function POST(req: Request) {
   try {
-    const { prompt, currentHtml } = await req.json();
+    const { prompt, currentHtml, style = 'auto', color = 'auto' } = await req.json();
 
     if (!prompt) {
       return NextResponse.json(
@@ -77,9 +77,34 @@ export async function POST(req: Request) {
       );
     }
 
+    const styleInstructions: Record<string, string> = {
+      auto: "AI's Choice: Analyze the user's business niche/prompt and automatically select the most appropriate design framework (Futuristic Dark, Sleek Minimalist, Glassmorphism, or Brutalist Neon) that best fits the brand identity. You must determine if a dark, light, frosted, or retro brutalist aesthetic is best.",
+      dark: "Futuristic Dark: Design a sleek, modern dark-mode website. Use very dark backgrounds (e.g. #02040a, #06080d), deep slate card layers, subtle neon borders, glowing shadow effects, and glowing accents. The typography should be futuristic (e.g. Orbitron, Outfit, or Inter) and clean.",
+      light: "Sleek Minimalist: Design a clean, bright, ultra-premium light-mode website. Use clean white or off-white backgrounds (e.g. #f8fafc, #ffffff), sharp contrast boundaries, subtle drop shadows (shadow-sm, shadow-md), fine borders, and refined elegant typography (e.g. Plus Jakarta Sans or Playfair Display). Avoid heavy dark backgrounds entirely.",
+      glassmorphism: "Glassmorphism: Design a premium glassmorphic frosted-glass style website. Use beautiful colorful ambient mesh gradients in the background (pastel purples, pinks, cyans), cards with semi-transparent white backgrounds and heavy backdrop-blur (e.g. bg-white/10 backdrop-blur-md border border-white/20), glowing highlight borders, and soft shadows.",
+      brutalism: "Brutalist Neon: Design a bold, expressive, neo-brutalist website. Use raw, thick black borders (border-2 border-black, border-4 border-black), thick flat drop shadows (shadow-[4px_4px_0px_#000]), high contrast flat layouts, bright retro neon backgrounds, and loud, expressive uppercase sans-serif typography."
+    };
+
+    const colorInstructions: Record<string, string> = {
+      auto: "AI's Choice: Automatically choose the best branding color scheme and primary accent color (e.g., Emerald, Mint Teal, Ice Cyan, Warm Gold, or any high-end professional palette) that perfectly matches the user's business niche and brand identity.",
+      emerald: "Emerald Accent Glow: Use emerald green (e.g. #10b981, Tailwind green-500/600) as the primary branding and accent color. Implement beautiful emerald green gradients, emerald active navigation indicators, emerald borders, and glowing green highlights for active states and primary buttons.",
+      teal: "Mint Teal Accent Glow: Use mint teal (e.g. #14b8a6, Tailwind teal-500/600) as the primary branding and accent color. Implement beautiful teal gradients, teal active navigation indicators, teal borders, and glowing teal highlights for active states and primary buttons.",
+      cyan: "Ice Cyan Accent Glow: Use ice cyan (e.g. #06b6d4, Tailwind cyan-500/600) as the primary branding and accent color. Implement beautiful ice cyan gradients, cyan active navigation indicators, cyan borders, and glowing cyan highlights for active states and primary buttons.",
+      amber: "Warm Gold Accent Glow: Use warm gold / amber (e.g. #f59e0b, Tailwind amber-500/600) as the primary branding and accent color. Implement beautiful amber/gold gradients, amber active navigation indicators, amber borders, and glowing gold/amber highlights for active states and primary buttons."
+    };
+
+    const selectedStyleInstr = styleInstructions[style] || styleInstructions.auto;
+    const selectedColorInstr = colorInstructions[color] || colorInstructions.auto;
+
+    const stylingPrompt = `\n\nDESIGN SYSTEM & COLOR SCHEME SPECIFICATION:
+1. DESIGN STYLE FRAMEWORK:
+   - ${selectedStyleInstr}
+2. PRIMARY ACCENT GLOW & THEMING:
+   - ${selectedColorInstr}`;
+
     const userContent = currentHtml
-      ? `User Request: "${prompt}"\n\nCurrent HTML Code:\n${currentHtml}`
-      : `Create a complete, highly-interactive multi-page HTML website with client-side hash routing based on: "${prompt}". Make it look amazing, professional, and fully complete with navigation, multiple sections/pages, and responsive layouts.`;
+      ? `User Request: "${prompt}"${stylingPrompt}\n\nCurrent HTML Code:\n${currentHtml}`
+      : `Create a complete, highly-interactive multi-page HTML website with client-side hash routing based on: "${prompt}". Make it look amazing, professional, and fully complete with navigation, multiple sections/pages, and responsive layouts.${stylingPrompt}`;
 
     const result = streamText({
       model: google('gemini-3-flash-preview'),
