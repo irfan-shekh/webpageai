@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "WebpageAI – AI Website Builder",
+  title: "WebpageAI – AI Webpage Builder",
   description: "Generate complete multi-page websites with interactive client-side routing in seconds. Powered by advanced AI.",
 };
 
