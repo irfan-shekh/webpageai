@@ -1,4 +1,4 @@
-# AI Landing Page Generator
+# WebPageai Generator
 
 A full-stack Next.js application that uses AI to generate high-converting landing pages.
 
